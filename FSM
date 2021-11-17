@@ -1,0 +1,8 @@
+if __name__ == "__main__":
+    print("this is FSM class")
+
+class FSM:
+    nodes = []
+    edges = []
+    def __init__(self):
+        print("unfinished")
