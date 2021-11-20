@@ -1,6 +1,7 @@
 import numpy as np
 import block
 import tkinter as tk
+import tkinter.messagebox
 
 
 def next_position(direction, _x, _y):
@@ -34,33 +35,32 @@ class game:
 
         print("unfinished")
 
-    def hit_wall_check(self, direction):
+    def p_hit_wall_check(self, direction):
         return self.board[next_position(direction, self.player_x, self.player_y)].is_wall()
 
-    def hit_block_check(self, direction):
+    def p_hit_block_check(self, direction):
         return self.board[next_position(direction, self.player_x, self.player_y)].tag == 0
 
-    def hit_box_check(self, direction):
-        return self.board[next_position(direction, self.player_x, self.player_y)].is_box()
+    def p_hit_box_check(self, direction):
+        _next_player_position = next_position(direction, self.player_x, self.player_y)
+        # _next_box_position = next_position(direction,_next_player_position[0],_next_player_position[1])
+        return self.board[_next_player_position].is_box()  # self.board[_next_box_position].is_box()
 
-    def hit_target_check(self, direction):
+    def p_hit_target_check(self, direction):
         return self.board[next_position(direction, self.player_x, self.player_y)].is_target()
 
-    def make_push(self, direction):
-        exit(1)
+    def p_hit_score_check(self, direction):
+        return self.board[next_position(direction, self.player_x, self.player_y)].is_score()
 
-    def make_move(self, direction):
+    def update_player(self, direction):
+
         if direction == 1:
-
             self.player_x -= 1
         elif direction == 2:
-
             self.player_x += 1
         elif direction == 3:
-
             self.player_y -= 1
         elif direction == 4:
-
             self.player_y += 1
 
     def step(self, direction):
@@ -69,22 +69,76 @@ class game:
         if self.player_x == -1 or self.player_y == -1:
             print("not initialized..... exit")
             exit(1)
-        if direction == 1:
-            if not self.hit_wall_check(direction):
-                if self.hit_block_check(direction) or self.hit_target_check(direction):
-                    self.make_move(1)
-        if direction == 2:
-            if not self.hit_wall_check(direction):
-                if self.hit_block_check(direction) or self.hit_target_check(direction):
-                    self.make_move(2)
+        # if direction == 1:
+        if not self.p_hit_wall_check(direction):
+            if self.p_hit_block_check(direction) or self.p_hit_target_check(direction):
+                self.update_player(direction)
+            elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
+                next_player_position = next_position(direction, self.player_x, self.player_y)
+                next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                if not self.board[next_box_position].is_wall():
+                    self.update_player(direction)
+                    self.board[next_player_position] = block.block(next_box_position[0], next_box_position[1])
+                    if self.board[next_box_position].is_target():
+                        self.board[next_box_position] = block.score(next_box_position[0], next_box_position[1])
+                        self.number_of_box_on_target += 1
+                        print("hit target" + str(self.number_of_box_on_target) + "/" + str(self.number_of_box))
+                    else:
+                        self.board[next_box_position] = block.box(next_box_position[0], next_box_position[1])
+            elif self.p_hit_score_check(direction):
+                next_player_position = next_position(direction, self.player_x, self.player_y)
+                next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                if not self.board[next_box_position].is_wall():
+                    self.update_player(direction)
+                    self.board[next_player_position] = block.target(next_box_position[0], next_box_position[1])
+                    self.number_of_box_on_target -= 1
+                    print("lose target" + str(self.number_of_box_on_target) + "/" +str(self.number_of_box))
+                    if self.board[next_box_position].is_target():
+                        self.board[next_box_position] = block.score(next_box_position[0], next_box_position[1])
+                        self.number_of_box_on_target += 1
+                        print("hit target"+ str(self.number_of_box_on_target) + "/" +str(self.number_of_box))
+                    else:
+                        self.board[next_box_position] = block.box(next_box_position[0], next_box_position[1])
+
+
+
+        '''
+         if direction == 2:
+            if not self.p_hit_wall_check(direction):
+                if self.p_hit_block_check(direction) or self.p_hit_target_check(direction):
+                    self.update_player(direction)
+                elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
+                    next_player_position = next_position(direction, self.player_x, self.player_y)
+                    next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                    if not self.board[next_box_position].is_wall():
+                        self.update_player(direction)
+                        self.board[next_player_position] = block.block(next_box_position[0], next_box_position[1])
+                        self.board[next_box_position] = block.box(next_box_position[0],next_box_position[1])
         if direction == 3:
-            if not self.hit_wall_check(direction):
-                if self.hit_block_check(direction) or self.hit_target_check(direction):
-                    self.make_move(3)
+            if not self.p_hit_wall_check(direction):
+                if self.p_hit_block_check(direction) or self.p_hit_target_check(direction):
+                    self.update_player(direction)
+                elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
+                    next_player_position = next_position(direction, self.player_x, self.player_y)
+                    next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                    if not self.board[next_box_position].is_wall():
+                        self.update_player(direction)
+                        self.board[next_player_position] = block.block(next_box_position[0], next_box_position[1])
+                        self.board[next_box_position] = block.box(next_box_position[0],next_box_position[1])
         if direction == 4:
-            if not self.hit_wall_check(direction):
-                if self.hit_block_check(direction) or self.hit_target_check(direction):
-                    self.make_move(4)
+            if not self.p_hit_wall_check(direction):
+                if self.p_hit_block_check(direction) or self.p_hit_target_check(direction):
+                    self.update_player(direction)
+                elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
+                    next_player_position = next_position(direction, self.player_x, self.player_y)
+                    next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                    if not self.board[next_box_position].is_wall():
+                        self.update_player(direction)
+                        self.board[next_player_position] = block.block(next_box_position[0], next_box_position[1])
+                        self.board[next_box_position] = block.box(next_box_position[0],next_box_position[1])
+        
+        
+        '''
 
 
 def read_input(file_name):
@@ -134,9 +188,9 @@ def draw(canvas, grids_data, x, y):
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='brown')
         # elif grids_data[key].is_player():
         # canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='blue')
-        elif grids_data[key].is_box():
+        elif grids_data[key].is_box() and (not grids_data[key].is_target()):
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='yellow')
-        elif grids_data[key].is_target():
+        elif grids_data[key].is_target()and (not grids_data[key].is_score()):
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='red')
         elif grids_data[key].is_score():
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='black')
@@ -188,6 +242,8 @@ if __name__ == "__main__":
         g.step(1)
         draw(canvas, g.board, g.player_x, g.player_y)
         print("up")
+        if g.number_of_box == g.number_of_box_on_target:
+            tk.messagebox.showinfo("result", "Successful")
         return canvas
 
 
@@ -195,6 +251,8 @@ if __name__ == "__main__":
         g.step(2)
         draw(canvas, g.board, g.player_x, g.player_y)
         print("down")
+        if g.number_of_box == g.number_of_box_on_target:
+            tk.messagebox.showinfo("result", "Successful")
         return canvas
 
 
@@ -202,6 +260,8 @@ if __name__ == "__main__":
         g.step(3)
         draw(canvas, g.board, g.player_x, g.player_y)
         print("left")
+        if g.number_of_box == g.number_of_box_on_target:
+            tk.messagebox.showinfo("result", "Successful")
         return canvas
 
 
@@ -209,6 +269,9 @@ if __name__ == "__main__":
         g.step(4)
         draw(canvas, g.board, g.player_x, g.player_y)
         print("right")
+        if g.number_of_box == g.number_of_box_on_target:
+            tk.messagebox.showinfo("result", "Successful")
+            window.
         return canvas
 
 
