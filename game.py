@@ -271,7 +271,6 @@ if __name__ == "__main__":
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
-            window.
         return canvas
 
 
