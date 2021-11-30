@@ -10,7 +10,7 @@ class block:
     def __init__(self, _x, _y):
         self.x = _x
         self.y = _y
-        print("block create at " + str(self.x) + ", " + str(self.y))
+        # print("block create at " + str(self.x) + ", " + str(self.y))
 
 
     def is_player(self):
@@ -34,7 +34,7 @@ class player(block):
         self.x = _x
         self.y = _y
         self.tag = 1
-        print("player create at " + str(self.x) + ", " + str(self.y))
+        # print("player create at " + str(self.x) + ", " + str(self.y))
 
     def is_player(self):
         return True
@@ -45,7 +45,7 @@ class wall(block):
         self.x = _x
         self.y = _y
         self.tag = 2
-        print("wall create at " + str(self.x) + ", " + str(self.y))
+        # print("wall create at " + str(self.x) + ", " + str(self.y))
 
     def is_wall(self):
         return True
@@ -56,7 +56,7 @@ class target(block):
         self.x = _x
         self.y = _y
         self.tag = 3
-        print("target create at " + str(self.x) + ", " + str(self.y))
+        # print("target create at " + str(self.x) + ", " + str(self.y))
 
     def is_target(self):
         return True
@@ -67,7 +67,7 @@ class box(block):
         self.x = _x
         self.y = _y
         self.tag = 4
-        print("box create at " + str(self.x) + ", " + str(self.y))
+        # print("box create at " + str(self.x) + ", " + str(self.y))
 
     def is_box(self):
         return True
@@ -78,7 +78,7 @@ class score(block):
         self.x = _x
         self.y = _y
         self.tag = 5
-        print("score create at " + str(self.x) + ", " + str(self.y))
+        # print("score create at " + str(self.x) + ", " + str(self.y))
 
     def is_box(self):
         return True

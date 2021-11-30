@@ -2,7 +2,8 @@ import numpy as np
 import block
 import tkinter as tk
 import tkinter.messagebox
-
+import time
+from RL import QLearning
 
 def next_position(direction, _x, _y):
     if direction == 1:
@@ -23,16 +24,18 @@ class game:
     board = {}
     number_of_box = -1
     number_of_box_on_target = -1
-
+    v = 0
+    h = 0
     '''board is dict, given (x,y) => block'''
 
-    def __init__(self, _player_x, _player_y, number, data):
+    def __init__(self, _player_x, _player_y, number, data, _v, _h):
         self.player_x = _player_x
         self.player_y = _player_y
         self.number_of_box = number
         self.board = data
         self.number_of_box_on_target = 0  # fix latter
-
+        self.v = _v
+        self.h = _h
         print("unfinished")
 
     def p_hit_wall_check(self, direction):
@@ -139,7 +142,42 @@ class game:
         
         
         '''
+    def getState(self):
+        state = []
+        # print("board = ", self.board)
+        for i in range(1, self.h):
+            for j in range(1, self.v):
+                if self.board[i, j].is_box():
+                    state.append([i, j])
+        return state
 
+    def Manhattan_Dis(self, x, y):
+        return abs(x[0] - y[0]) + abs(x[1] - y[1])
+
+    def evaluateAction(self, action, target, totalSteps):
+        if(action == 1):
+            left()
+        elif(action == 2):
+            up()
+        elif(action == 3):
+            right()
+        elif(action == 4):
+            down()
+        new_state = self.getState()
+        finished = False
+        reward = 0
+        for i in range(len(new_state)):
+            r = 100000
+            for j in range(len(target)):
+                r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+            if r == 0:
+                reward += 10
+            else:
+                reward -= r
+        if reward == 0:
+            finished = True
+        reward -= 0.1 * totalSteps
+        return new_state, reward, finished
 
 def read_input(file_name):
     data_flow = []
@@ -150,25 +188,30 @@ def read_input(file_name):
             for v in values:
                 data_flow.append(v)
     print("done reading")
+    # print("data_flow = ", data_flow)
     number_of_box = 0
     vertical_length = data_flow.pop(0)
     horizontal_length = data_flow.pop(0)
     x = -1
     y = -1
-
+    # print("data_flow = ", data_flow)
     grids = {}
     for i in range(data_flow.pop(0)):
         x = data_flow.pop(0)
         y = data_flow.pop(0)
         grids[x, y] = block.wall(x, y)
     number_of_box = data_flow.pop(0)
+    box_positions = []
     for i in range(number_of_box):
         x = data_flow.pop(0)
         y = data_flow.pop(0)
+        box_positions.append([x, y])
         grids[x, y] = block.box(x, y)
+    target_positions = []
     for i in range(data_flow.pop(0)):
         x = data_flow.pop(0)
         y = data_flow.pop(0)
+        target_positions.append([x, y])
         grids[x, y] = block.target(x, y)
     x = data_flow.pop(0)
     y = data_flow.pop(0)
@@ -179,7 +222,7 @@ def read_input(file_name):
             if (i, j) not in grids:
                 grids[i, j] = block.block(i, j)
 
-    return data_flow, grids, vertical_length, horizontal_length, number_of_box, x, y
+    return data_flow, grids, box_positions, target_positions, vertical_length, horizontal_length, number_of_box, x, y
 
 
 def draw(canvas, grids_data, x, y):
@@ -203,12 +246,38 @@ def draw(canvas, grids_data, x, y):
     return canvas
 
 
+def AI_Sokoban(grids, state, target):
+    agent = QLearning()
+    # for episode in range(10):
+    totalSteps = 0
+    while True:
+        action = agent.chooseAction(str(state))
+        totalSteps = totalSteps + 1
+        next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
+        agent.Q_learning(str(state), action, reward, str(next_state), finished)
+        state = next_state
+        if finished:
+            break
+            # time.sleep(0.2)
+    print('totalSteps = ', totalSteps)
+    # left()
+    # return 0
+
+
 if __name__ == "__main__":
     print("this is game class")
     print("test starts")
 
-    data, grids_data, v, h, n, x, y = read_input("sokoban00.txt")
-
+    data, grids_data, box_positions, target_positions, v, h, n, x, y = read_input("sokoban00.txt")
+    # print("data = ", data)
+    # print("grids_data = ", grids_data)
+    # print("v = ", v)
+    # print("h = ", h)
+    # print("n = ", n)
+    # print("x = ", x)
+    # print("y = ", y)
+    # print("states = ", box_positions)
+    # exit()
     '''
     
     
@@ -229,14 +298,14 @@ if __name__ == "__main__":
         for j in range(h):
             row.append(canvas.create_rectangle(j * 20 + 50, i * 20 + 30, j * 20 + 20 + 50, i * 20 + 30 + 20))
         grids.append(row)
-
+    print(grids)
+    # exit()
     # draw
 
     canvas = draw(canvas, grids_data, x, y)
-
     canvas.pack()
-    g = game(x, y, n, grids_data)
-
+    g = game(x, y, n, grids_data, v, h)
+    # exit()
 
     def up():
         g.step(1)
@@ -280,5 +349,8 @@ if __name__ == "__main__":
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
 
     print("load game")
-
+    # exit()
+    box_positions = g.getState()
+    # AI_Sokoban(grids_data, box_positions, target_positions)
+    window.after(100, AI_Sokoban(grids_data, box_positions, target_positions))
     window.mainloop()
