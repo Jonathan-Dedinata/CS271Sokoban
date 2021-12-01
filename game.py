@@ -45,7 +45,7 @@ class game:
     def reset(self):
         self.player_x = self.copy_player_x
         self.player_y = self.copy_player_y
-        self.board =  self.copy_board
+        self.board =  deepcopy(self.copy_board)
         self.number_of_box_on_target = 0
 
     
@@ -257,21 +257,7 @@ def draw(canvas, grids_data, x, y):
     return canvas
 
 
-def AI_Sokoban(grids, state, target):
-    agent = QLearning()
-    for episode in range(10):
-        totalSteps = 0
-        while True:
-            action = agent.chooseAction(str(state))
-            totalSteps = totalSteps + 1
-            next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
-            agent.Q_learning(str(state), action, reward, str(next_state), finished)
-            state = next_state
-            if finished or totalSteps > 1000:
-                break
-            time.sleep(0.005)
-            print('currSteps = ', totalSteps)
-    print('totalSteps = ', totalSteps)
+
     # left()
     # return 0
 
@@ -322,6 +308,33 @@ if __name__ == "__main__":
     canvas.pack()
     g = game(x, y, n, grids_data, v, h)
     # exit()
+    reset_flag = False
+
+
+    def AI_Sokoban(grids, state, target):
+        agent = QLearning()
+        reset_flag = False
+        for episode in range(10):
+            totalSteps = 0
+            while True:
+                action = agent.chooseAction(str(state))
+                totalSteps = totalSteps + 1
+                next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
+                agent.Q_learning(str(state), action, reward, str(next_state), finished)
+                state = next_state
+                if finished or totalSteps > 1000:
+                    break
+                time.sleep(0.1)
+                if reset_flag:
+                    break
+                print('currSteps = ', totalSteps)
+        print('totalSteps = ', totalSteps)
+
+    def freeze():
+        freeze_flag =True
+
+    def restart():
+        freeze_flag = False
 
     def up():
         g.step(1)
@@ -364,10 +377,11 @@ if __name__ == "__main__":
 
 
     def reset():
+        reset_flag = True
         g.reset()
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
-
+        return reset_flag
 
 
     box_positions = g.getState()
@@ -376,7 +390,9 @@ if __name__ == "__main__":
     b_left = tk.Button(window, text='LEFT', command=left).place(x=300, y=700)
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
     b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
-    b_reset = tk.Button(window, text='RESET', command =reset).place(x=600, y=700)
+    b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
+   # b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
+    #b_restart = tk.Button(window, text='RESTART', command =restart).place(x=800, y=700)
     print("load game")
     # exit()
 
