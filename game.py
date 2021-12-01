@@ -4,6 +4,7 @@ import tkinter as tk
 import tkinter.messagebox
 import time
 from RL import QLearning
+from copy import deepcopy
 
 def next_position(direction, _x, _y):
     if direction == 1:
@@ -36,7 +37,18 @@ class game:
         self.number_of_box_on_target = 0  # fix latter
         self.v = _v
         self.h = _h
+        self.copy_player_x = self.player_x
+        self.copy_player_y = self.player_y
+        self.copy_board = deepcopy(self.board)
         print("unfinished")
+
+    def reset(self):
+        self.player_x = self.copy_player_x
+        self.player_y = self.copy_player_y
+        self.board =  self.copy_board
+        self.number_of_box_on_target = 0
+
+    
 
     def p_hit_wall_check(self, direction):
         return self.board[next_position(direction, self.player_x, self.player_y)].is_wall()
@@ -264,6 +276,10 @@ def AI_Sokoban(grids, state, target):
     # return 0
 
 
+
+
+
+
 if __name__ == "__main__":
     print("this is game class")
     print("test starts")
@@ -347,12 +363,20 @@ if __name__ == "__main__":
         return canvas
 
 
+    def reset():
+        g.reset()
+        draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
+
+
+
     box_positions = g.getState()
     b_up = tk.Button(window, text='UP', command=up).place(x=100, y=700)
     b_down = tk.Button(window, text='DOWN', command=down).place(x=200, y=700)
     b_left = tk.Button(window, text='LEFT', command=left).place(x=300, y=700)
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
     b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
+    b_reset = tk.Button(window, text='RESET', command =reset).place(x=600, y=700)
     print("load game")
     # exit()
 
