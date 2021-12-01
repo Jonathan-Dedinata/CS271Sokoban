@@ -145,8 +145,8 @@ class game:
     def getState(self):
         state = []
         # print("board = ", self.board)
-        for i in range(1, self.h):
-            for j in range(1, self.v):
+        for i in range(1, self.h + 1):
+            for j in range(1, self.v + 1):
                 if self.board[i, j].is_box():
                     state.append([i, j])
         return state
@@ -258,7 +258,7 @@ def AI_Sokoban(grids, state, target):
         state = next_state
         if finished:
             break
-            # time.sleep(0.2)
+        time.sleep(0.2)
     print('totalSteps = ', totalSteps)
     # left()
     # return 0
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     print("this is game class")
     print("test starts")
 
-    data, grids_data, box_positions, target_positions, v, h, n, x, y = read_input("sokoban00.txt")
+    data, grids_data, box_positions, target_positions, v, h, n, x, y = read_input("sokoban01.txt")
     # print("data = ", data)
     # print("grids_data = ", grids_data)
     # print("v = ", v)
