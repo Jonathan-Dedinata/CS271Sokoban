@@ -4,7 +4,7 @@ import random
 
 class QLearning:
 
-    def __init__(self, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
+    def __init__(self, learning_rate=0.1, reward_decay=0.9, e_greedy=0.8):
         self.actions = [1, 2, 3, 4]  # a list
         self.lr = learning_rate
         self.gamma = reward_decay
@@ -33,8 +33,8 @@ class QLearning:
         self.q_table.loc[state, action] += self.lr * (nextQ - curQ)
 
     def checkQTable(self, state):
-        print(state)
-        print(self.q_table.index)
+        # print(state)
+        # print(self.q_table.index)
         if state not in self.q_table.index:
             self.q_table = self.q_table.append(
                 pd.Series(

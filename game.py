@@ -176,7 +176,7 @@ class game:
                 reward -= r
         if reward == 0:
             finished = True
-        reward -= 0.1 * totalSteps
+        reward -= totalSteps
         return new_state, reward, finished
 
 def read_input(file_name):
@@ -247,17 +247,18 @@ def draw(canvas, grids_data, x, y):
 
 def AI_Sokoban(grids, state, target):
     agent = QLearning()
-    # for episode in range(10):
-    totalSteps = 0
-    while True:
-        action = agent.chooseAction(str(state))
-        totalSteps = totalSteps + 1
-        next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
-        agent.Q_learning(str(state), action, reward, str(next_state), finished)
-        state = next_state
-        if finished:
-            break
-        time.sleep(0.2)
+    for episode in range(10):
+        totalSteps = 0
+        while True:
+            action = agent.chooseAction(str(state))
+            totalSteps = totalSteps + 1
+            next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
+            agent.Q_learning(str(state), action, reward, str(next_state), finished)
+            state = next_state
+            if finished or totalSteps > 1000:
+                break
+            time.sleep(0.005)
+            print('currSteps = ', totalSteps)
     print('totalSteps = ', totalSteps)
     # left()
     # return 0
