@@ -74,7 +74,7 @@ class game:
             exit(1)
         # if direction == 1:
         if not self.p_hit_wall_check(direction):
-            if self.p_hit_block_check(direction) or self.p_hit_target_check(direction):
+            if (self.p_hit_block_check(direction) or self.p_hit_target_check(direction)) and not self.p_hit_score_check(direction):
                 self.update_player(direction)
             elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
                 next_player_position = next_position(direction, self.player_x, self.player_y)
