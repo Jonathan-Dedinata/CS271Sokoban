@@ -239,7 +239,6 @@ def draw(canvas, grids_data, x, y):
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='black')
         else:
             canvas.itemconfig(grids[key[0] - 1][key[1] - 1], fill='white')
-
     print(canvas.bbox(grids[x - 1][y - 1]))
     canvas.delete('player')
     canvas.create_oval(canvas.bbox(grids[x - 1][y - 1]), fill='grey', tag='player')
@@ -310,6 +309,7 @@ if __name__ == "__main__":
     def up():
         g.step(1)
         draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
@@ -319,6 +319,7 @@ if __name__ == "__main__":
     def down():
         g.step(2)
         draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
@@ -328,6 +329,7 @@ if __name__ == "__main__":
     def left():
         g.step(3)
         draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
@@ -337,20 +339,22 @@ if __name__ == "__main__":
     def right():
         g.step(4)
         draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
         return canvas
 
 
+    box_positions = g.getState()
     b_up = tk.Button(window, text='UP', command=up).place(x=100, y=700)
     b_down = tk.Button(window, text='DOWN', command=down).place(x=200, y=700)
     b_left = tk.Button(window, text='LEFT', command=left).place(x=300, y=700)
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
-
+    b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
     print("load game")
     # exit()
-    box_positions = g.getState()
+
     # AI_Sokoban(grids_data, box_positions, target_positions)
-    window.after(100, AI_Sokoban(grids_data, box_positions, target_positions))
+    # AI_Sokoban(grids_data, box_positions, target_positions)
     window.mainloop()
