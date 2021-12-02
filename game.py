@@ -384,6 +384,12 @@ if __name__ == "__main__":
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
 
+    def soft_reset_for_ML():
+        g.reset()
+        draw(canvas, g.board, g.player_x, g.player_y)
+        canvas.update()
+
+
 
 
     box_positions = g.getState()
@@ -393,6 +399,7 @@ if __name__ == "__main__":
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
     b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
     b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
+    b_soft_rest = tk.Button(window, text='SOFT_RESET', command = soft_reset_for_ML).place(x=600, y=600)
     #b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
     #b_restart = tk.Button(window, text='RESTART', command =restart).place(x=800, y=700)
     print("load game")
