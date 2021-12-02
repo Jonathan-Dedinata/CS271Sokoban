@@ -18,6 +18,9 @@ def next_position(direction, _x, _y):
     else:
         raise AttributeError("wrong direction")
 
+class freeze:
+    def __init__(self):
+        self.freeze_flag = False
 
 class game:
     player_x = -1
@@ -308,15 +311,20 @@ if __name__ == "__main__":
     canvas.pack()
     g = game(x, y, n, grids_data, v, h)
     # exit()
-    reset_flag = False
+
+    control_box = freeze()
+
+
 
 
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
-        reset_flag = False
+        control_box.freeze_flag = False
         for episode in range(10):
             totalSteps = 0
             while True:
+                if control_box.freeze_flag:
+                    break
                 action = agent.chooseAction(str(state))
                 totalSteps = totalSteps + 1
                 next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
@@ -325,16 +333,10 @@ if __name__ == "__main__":
                 if finished or totalSteps > 1000:
                     break
                 time.sleep(0.1)
-                if reset_flag:
-                    break
+
                 print('currSteps = ', totalSteps)
         print('totalSteps = ', totalSteps)
 
-    def freeze():
-        freeze_flag =True
-
-    def restart():
-        freeze_flag = False
 
     def up():
         g.step(1)
@@ -377,11 +379,11 @@ if __name__ == "__main__":
 
 
     def reset():
-        reset_flag = True
+        control_box.freeze_flag = True
         g.reset()
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
-        return reset_flag
+
 
 
     box_positions = g.getState()
@@ -391,7 +393,7 @@ if __name__ == "__main__":
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
     b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
     b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
-   # b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
+    #b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
     #b_restart = tk.Button(window, text='RESTART', command =restart).place(x=800, y=700)
     print("load game")
     # exit()
