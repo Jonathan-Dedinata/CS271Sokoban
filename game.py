@@ -216,12 +216,12 @@ class game:
                 if occupiedList[j] == 1: continue
                 r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
             if r == 0:
-                reward += 10
+                reward += 50
             else:
                 finished = False
-                reward -= r
+                # reward -= r
         if finished:
-            reward += 100
+            reward += 500
         reward -= 0.1 * totalSteps
         return new_state, reward, finished, stuck
 
@@ -365,7 +365,7 @@ if __name__ == "__main__":
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
                 preAction = action
-                if finished or totalSteps > 2000 or stuck:
+                if finished or totalSteps > 1000 or stuck:
                     break
                 time.sleep(0.0001)
 

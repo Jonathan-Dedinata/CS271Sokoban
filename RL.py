@@ -14,8 +14,8 @@ class QLearning:
     def chooseAction(self, state, preAction, totalSteps):
         # action = 1
         self.checkQTable(state)
-        if totalSteps > 500: p = 0.7
-        elif totalSteps > 200: p = 0.8
+        if totalSteps > 500: p = 0.8
+        # elif totalSteps > 200: p = 0.8
         else: p = self.epsilon
         if(random.random() < p):
             actions = self.q_table.loc[state, :]
