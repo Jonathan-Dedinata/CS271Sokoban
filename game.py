@@ -53,8 +53,10 @@ class game:
 
     
 
-    def p_hit_wall_check(self, direction):
-        return self.board[next_position(direction, self.player_x, self.player_y)].is_wall()
+    def p_not_move_check(self, direction):
+        next_player_position = next_position(direction, self.player_x, self.player_y)
+        next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+        return self.board[next_position(direction, self.player_x, self.player_y)].is_wall() or ( self.board[next_box_position].is_box() and self.board[next_player_position].is_box())
 
     def p_hit_block_check(self, direction):
         return self.board[next_position(direction, self.player_x, self.player_y)].tag == 0
@@ -88,12 +90,14 @@ class game:
             print("not initialized..... exit")
             exit(1)
         # if direction == 1:
-        if not self.p_hit_wall_check(direction):
+        next_player_position = next_position(direction, self.player_x, self.player_y)
+        next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+        if not self.p_not_move_check(direction):
             if (self.p_hit_block_check(direction) or self.p_hit_target_check(direction)) and not self.p_hit_score_check(direction):
                 self.update_player(direction)
             elif self.p_hit_box_check(direction) and (not self.p_hit_score_check(direction)):
-                next_player_position = next_position(direction, self.player_x, self.player_y)
-                next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                #next_player_position = next_position(direction, self.player_x, self.player_y)
+                #next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
                 if not self.board[next_box_position].is_wall():
                     self.update_player(direction)
                     self.board[next_player_position] = block.block(next_box_position[0], next_box_position[1])
@@ -104,8 +108,8 @@ class game:
                     else:
                         self.board[next_box_position] = block.box(next_box_position[0], next_box_position[1])
             elif self.p_hit_score_check(direction):
-                next_player_position = next_position(direction, self.player_x, self.player_y)
-                next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
+                #next_player_position = next_position(direction, self.player_x, self.player_y)
+                #next_box_position = next_position(direction, next_player_position[0], next_player_position[1])
                 if not self.board[next_box_position].is_wall():
                     self.update_player(direction)
                     self.board[next_player_position] = block.target(next_box_position[0], next_box_position[1])
