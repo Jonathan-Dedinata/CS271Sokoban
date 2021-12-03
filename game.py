@@ -164,6 +164,10 @@ class game:
             for j in range(1, self.v + 1):
                 if self.board[i, j].is_box():
                     state.append([i, j])
+        for i in range(1, self.h + 1):
+            for j in range(1, self.v + 1):
+                if self.board[i, j].is_player():
+                    state.append([i, j])
         return state
 
     def Manhattan_Dis(self, x, y):
@@ -179,20 +183,43 @@ class game:
         elif(action == 4):
             down()
         new_state = self.getState()
-        finished = False
+        finished = True
+        stuck = False
         reward = 0
-        for i in range(len(new_state)):
+        occupiedList = []
+        # for i in range(len(target)):
+        #     if self.board[target[i][0], target[i][1]].is_box():
+        #         occupiedList.append(1)
+        #     else:
+        #         occupiedList.append(0)
+
+        for i in range(len(target)):
+            x, y = new_state[i][0], new_state[i][1]
+            if self.board[x, y].is_target():
+                occupiedList.append(1)
+            else:
+                occupiedList.append(0)
+                if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_wall(): stuck = True
+                if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_wall(): stuck = True
+                if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
+                if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_wall(): stuck = True
+            if stuck:
+                reward -= 10
+
+        for i in range(len(target)):
             r = 100000
             for j in range(len(target)):
+                if occupiedList[j] == 1: continue
                 r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
             if r == 0:
                 reward += 10
             else:
+                finished = False
                 reward -= r
-        if reward == 0:
-            finished = True
-        reward -= totalSteps
-        return new_state, reward, finished
+        if finished:
+            reward += 100
+        reward -= 0.1 * totalSteps
+        return new_state, reward, finished, stuck
 
 def read_input(file_name):
     data_flow = []
@@ -320,19 +347,23 @@ if __name__ == "__main__":
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
         control_box.freeze_flag = False
-        for episode in range(10):
+        for episode in range(1000):
+            print("episode ", episode)
+            soft_reset_for_ML()
             totalSteps = 0
+            preAction = 0
             while True:
                 if control_box.freeze_flag:
                     break
-                action = agent.chooseAction(str(state))
+                action = agent.chooseAction(str(state), preAction, totalSteps)
                 totalSteps = totalSteps + 1
-                next_state, reward, finished = g.evaluateAction(action, target, totalSteps)
+                next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps)
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
-                if finished or totalSteps > 1000:
+                preAction = action
+                if finished or totalSteps > 2000 or stuck:
                     break
-                time.sleep(0.1)
+                time.sleep(0.0001)
 
                 print('currSteps = ', totalSteps)
         print('totalSteps = ', totalSteps)
@@ -392,12 +423,12 @@ if __name__ == "__main__":
 
 
 
-    box_positions = g.getState()
+    state = g.getState()
     b_up = tk.Button(window, text='UP', command=up).place(x=100, y=700)
     b_down = tk.Button(window, text='DOWN', command=down).place(x=200, y=700)
     b_left = tk.Button(window, text='LEFT', command=left).place(x=300, y=700)
     b_right = tk.Button(window, text='RIGHT', command=right).place(x=400, y=700)
-    b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, box_positions, target_positions)).place(x=500, y=700)
+    b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, state, target_positions)).place(x=500, y=700)
     b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
     b_soft_rest = tk.Button(window, text='SOFT_RESET', command = soft_reset_for_ML).place(x=600, y=600)
     #b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
