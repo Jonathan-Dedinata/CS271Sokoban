@@ -222,7 +222,7 @@ class game:
                 # reward -= r
         if finished:
             reward += 500
-        reward -= 0.1 * totalSteps
+        reward -= 1 * totalSteps
         return new_state, reward, finished, stuck
 
 def read_input(file_name):
@@ -351,7 +351,7 @@ if __name__ == "__main__":
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
         control_box.freeze_flag = False
-        for episode in range(1000):
+        for episode in range(100000):
             print("episode ", episode)
             soft_reset_for_ML()
             totalSteps = 0
@@ -365,9 +365,9 @@ if __name__ == "__main__":
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
                 preAction = action
-                if finished or totalSteps > 1000 or stuck:
+                if finished or totalSteps > 2000 or stuck:
                     break
-                time.sleep(0.0001)
+                # time.sleep(0.00005)
 
                 print('currSteps = ', totalSteps)
         print('totalSteps = ', totalSteps)
@@ -380,7 +380,7 @@ if __name__ == "__main__":
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -391,7 +391,7 @@ if __name__ == "__main__":
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -402,7 +402,7 @@ if __name__ == "__main__":
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -413,7 +413,7 @@ if __name__ == "__main__":
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
             tk.messagebox.showinfo("result", "Successful")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 

@@ -4,19 +4,20 @@ import random
 
 class QLearning:
 
-    def __init__(self, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
+    def __init__(self, _learning_rate=0.2, _gamma=0.8, _possibility=0.9):
         self.actions = [1, 2, 3, 4]  # a list
-        self.lr = learning_rate
-        self.gamma = reward_decay
-        self.epsilon = e_greedy
+        self.learning_rate = _learning_rate
+        self.gamma = _gamma
+        self.possibility = _possibility
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
     def chooseAction(self, state, preAction, totalSteps):
         # action = 1
         self.checkQTable(state)
-        if totalSteps > 500: p = 0.8
-        # elif totalSteps > 200: p = 0.8
-        else: p = self.epsilon
+        # if totalSteps > 1000: p = 0.7
+        # elif totalSteps > 500: p = 0.8
+        # else: p = self.possibility
+        p = self.possibility
         if(random.random() < p):
             actions = self.q_table.loc[state, :]
             action = np.random.choice(actions[actions == actions.max()].index)
@@ -35,7 +36,7 @@ class QLearning:
             nextQ = reward
         # print(self.q_table[state, action])
         curQ = self.q_table.loc[state, action]
-        self.q_table.loc[state, action] += self.lr * (nextQ - curQ)
+        self.q_table.loc[state, action] += self.learning_rate * (nextQ - curQ)
 
     def checkQTable(self, state):
         # print(state)
