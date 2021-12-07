@@ -1,4 +1,5 @@
 import tkinter as tk
+import sysconfig
 
 
 def onKeyPress(event):
@@ -13,7 +14,8 @@ if __name__ == "__main__":
     print(random.random())
     print(random.random())
     print(random.random())
-
+    c = sysconfig.get_platform()
+    print(c)
     root = tk.Tk()
     root.geometry('300x200')
     text = tk.Text(root, background='black', foreground='white', font=('Comic Sans MS', 12))

@@ -1,10 +1,12 @@
-import numpy as np
+
 import block
 import tkinter as tk
 import tkinter.messagebox
 import time
 from RL import QLearning
 from copy import deepcopy
+import platform
+import pprint
 
 def next_position(direction, _x, _y):
     if direction == 1:
@@ -316,8 +318,25 @@ def draw(canvas, grids_data, x, y):
 if __name__ == "__main__":
     print("this is game class")
     print("test starts")
+    file_name = input("enter file name")
+    try:
+        f = open(file_name + "_result")
+        f.close()
+    except IOError:
+        f = open(file_name + "_result", 'w')
+        config = {platform.machine(),platform.version(),platform.platform(),platform.uname(),platform.processor()}
+        config = pprint.pformat(config)
+        f.write(str(config))
+        f.flush()
+        f.close()
 
-    data, grids_data, box_positions, target_positions, v, h, n, x, y = read_input("sokoban01.txt")
+
+
+    result = open(file_name + "_result",'a')
+
+
+    data, grids_data, box_positions, target_positions, v, h, n, x, y = read_input(file_name)
+    #"sokoban01.txt"
     # print("data = ", data)
     # print("grids_data = ", grids_data)
     # print("v = ", v)
@@ -327,11 +346,6 @@ if __name__ == "__main__":
     # print("y = ", y)
     # print("states = ", box_positions)
     # exit()
-    '''
-    
-    
-    
-    '''
 
     window = tk.Tk()
 
@@ -390,49 +404,54 @@ if __name__ == "__main__":
         # print('totalSteps = ', totalSteps)
 
 
-    def up():
+    def up(e):
         g.step(1)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
+            result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             reset()
         return canvas
 
 
-    def down():
+    def down(e):
         g.step(2)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
+            result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             reset()
         return canvas
 
 
-    def left():
+    def left(e):
         g.step(3)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
+            result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             reset()
         return canvas
 
 
-    def right():
+    def right(e):
         g.step(4)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
+            result.write(str((control_box.T2 - control_box.T1))+"\n")
+            result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
             reset()
         return canvas
