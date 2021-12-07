@@ -355,6 +355,7 @@ if __name__ == "__main__":
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
         control_box.freeze_flag = False
+        control_box.T1  = time.time()
 
         for episode in range(100000):
             print("episode ", episode)
