@@ -11,7 +11,7 @@ class QLearning:
         self.possibility = _possibility
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
-    def chooseAction(self, state, preAction, totalSteps):
+    def chooseAction(self, state, preAction, totalSteps, success_times):
         # action = 1
         self.checkQTable(str(state))
         # if totalSteps > 1000: p = 0.7
@@ -29,7 +29,7 @@ class QLearning:
         self.checkQTable(str(down_state))
         self.checkQTable(str(right_state))
         self.checkQTable(str(left_state))
-        p = self.possibility
+        p = self.possibility + 0.01 * success_times
         if(random.random() < p):
             actions = self.q_table.loc[str(state), :]
             action = np.random.choice(actions[actions == actions.max()].index)
@@ -52,7 +52,7 @@ class QLearning:
 
     def checkQTable(self, state):
         # print(state)
-        # print(self.q_table.index)
+        print(self.q_table.index)
         if state not in self.q_table.index:
             self.q_table = self.q_table.append(
                 pd.Series(

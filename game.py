@@ -226,6 +226,7 @@ class game:
             for j in range(len(target)):
                 if occupiedList[j] != 1:
                     r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+            # some problem
             if old_state == new_state:
                 reward -= 1000
                 finished = False
@@ -234,6 +235,7 @@ class game:
             else:
                 finished = False
                 reward -= r
+
         if finished:
             reward += 500
         reward -= 1 * totalSteps
@@ -387,16 +389,21 @@ if __name__ == "__main__":
             soft_reset_for_ML()
             totalSteps = 0
             preAction = 0
+            success_times = 0
             while True:
+                # print(state)
                 if control_box.freeze_flag:
                     break
-                action = agent.chooseAction(state, preAction, totalSteps)
+                action = agent.chooseAction(state, preAction, totalSteps, success_times)
                 totalSteps = totalSteps + 1
                 next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps)
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
                 preAction = action
-                if finished or totalSteps > 2000 or stuck:
+                if finished:  
+                    success_times += 1
+                    break
+                if totalSteps > 2000 or stuck:
                     break
                 # time.sleep(0.00005)
 
@@ -413,7 +420,7 @@ if __name__ == "__main__":
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -426,7 +433,7 @@ if __name__ == "__main__":
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -439,7 +446,7 @@ if __name__ == "__main__":
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+"\n")
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
@@ -453,7 +460,7 @@ if __name__ == "__main__":
             result.write(str((control_box.T2 - control_box.T1))+"\n")
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
-            reset()
+            soft_reset_for_ML()
         return canvas
 
 
