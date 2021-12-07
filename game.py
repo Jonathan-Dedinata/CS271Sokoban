@@ -178,13 +178,13 @@ class game:
     def evaluateAction(self, action, target, totalSteps):
         old_state = self.getState()
         if(action == 1):
-            left()
+            left('')
         elif(action == 2):
-            up()
+            up('')
         elif(action == 3):
-            right()
+            right('')
         elif(action == 4):
-            down()
+            down('')
         new_state = self.getState()
         finished = True
         stuck = False
@@ -364,8 +364,12 @@ if __name__ == "__main__":
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
         control_box.freeze_flag = False
+        control_box.T1  = time.time()
+
         for episode in range(100000):
-            # print("episode ", episode)
+            if control_box.freeze_flag:
+                break
+            print("episode ", episode)
             soft_reset_for_ML()
             totalSteps = 0
             preAction = 0
@@ -392,8 +396,9 @@ if __name__ == "__main__":
         canvas.update()
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
-            tk.messagebox.showinfo("result", "Successful")
-            soft_reset_for_ML()
+            control_box.T2 = time.time()
+            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            reset()
         return canvas
 
 
@@ -403,8 +408,9 @@ if __name__ == "__main__":
         canvas.update()
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
-            tk.messagebox.showinfo("result", "Successful")
-            soft_reset_for_ML()
+            control_box.T2 = time.time()
+            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            reset()
         return canvas
 
 
@@ -414,8 +420,9 @@ if __name__ == "__main__":
         canvas.update()
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
-            tk.messagebox.showinfo("result", "Successful")
-            soft_reset_for_ML()
+            control_box.T2 = time.time()
+            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            reset()
         return canvas
 
 
@@ -425,8 +432,9 @@ if __name__ == "__main__":
         canvas.update()
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
-            tk.messagebox.showinfo("result", "Successful")
-            soft_reset_for_ML()
+            control_box.T2 = time.time()
+            tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
+            reset()
         return canvas
 
 
