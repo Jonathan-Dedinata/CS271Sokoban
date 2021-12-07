@@ -21,10 +21,6 @@ def next_position(direction, _x, _y):
 class freeze:
     def __init__(self):
         self.freeze_flag = False
-        self.T1 = time.time()
-        self.T2 = -1
-    def get_t2(self):
-        self.T2 = time.time()
 
 class game:
     player_x = -1
@@ -180,6 +176,7 @@ class game:
         return abs(x[0] - y[0]) + abs(x[1] - y[1])
 
     def evaluateAction(self, action, target, totalSteps):
+        old_state = self.getState()
         if(action == 1):
             left()
         elif(action == 2):
@@ -220,21 +217,25 @@ class game:
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
                 if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
             if stuck:
-                reward -= 10000
+                reward -= 1000
 
         for i in range(len(target)):
-            r = 10000
+            r = 1000
             for j in range(len(target)):
-                if occupiedList[j] == 1: continue
-                r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
-            if r == 0:
-                reward += 500
+                if occupiedList[j] != 1:
+                    r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+            if old_state == new_state:
+                reward -= 1000
+                finished = False
+            elif r == 0:
+                reward += 50
             else:
                 finished = False
                 reward -= r
         if finished:
-            reward += 1000
+            reward += 500
         reward -= 1 * totalSteps
+        # print(reward)
         return new_state, reward, finished, stuck
 
 def read_input(file_name):
@@ -363,9 +364,8 @@ if __name__ == "__main__":
     def AI_Sokoban(grids, state, target):
         agent = QLearning()
         control_box.freeze_flag = False
-
         for episode in range(100000):
-            print("episode ", episode)
+            # print("episode ", episode)
             soft_reset_for_ML()
             totalSteps = 0
             preAction = 0
@@ -382,61 +382,56 @@ if __name__ == "__main__":
                     break
                 # time.sleep(0.00005)
 
-                print('currSteps = ', totalSteps)
-        print('totalSteps = ', totalSteps)
+        #         print('currSteps = ', totalSteps)
+        # print('totalSteps = ', totalSteps)
 
 
-    def up(e):
+    def up():
         g.step(1)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
-            control_box.T2 = time.time()
-            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            tk.messagebox.showinfo("result", "Successful")
             soft_reset_for_ML()
         return canvas
 
 
-    def down(e):
+    def down():
         g.step(2)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
-            control_box.T2 = time.time()
-            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            tk.messagebox.showinfo("result", "Successful")
             soft_reset_for_ML()
         return canvas
 
 
-    def left(e):
+    def left():
         g.step(3)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
-            control_box.T2 = time.time()
-            tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            tk.messagebox.showinfo("result", "Successful")
             soft_reset_for_ML()
         return canvas
 
 
-    def right(e):
+    def right():
         g.step(4)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
-            control_box.T2 = time.time()
-            tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
+            tk.messagebox.showinfo("result", "Successful")
             soft_reset_for_ML()
         return canvas
 
 
     def reset():
         control_box.freeze_flag = True
-        control_box.T1 = time.time()
         g.reset()
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
@@ -449,7 +444,6 @@ if __name__ == "__main__":
 
 
 
-
     state = g.getState()
     b_up = tk.Button(window, text='UP', command=up).place(x=100, y=700)
     b_down = tk.Button(window, text='DOWN', command=down).place(x=200, y=700)
@@ -458,11 +452,6 @@ if __name__ == "__main__":
     b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, state, target_positions)).place(x=500, y=700)
     b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
     b_soft_rest = tk.Button(window, text='SOFT_RESET', command = soft_reset_for_ML).place(x=600, y=600)
-
-    window.bind('<Up>',up)
-    window.bind('<Down>', down)
-    window.bind('<Left>', left)
-    window.bind('<Right>', right)
     #b_freeze = tk.Button(window, text='FREEZE', command =freeze).place(x=700, y=700)
     #b_restart = tk.Button(window, text='RESTART', command =restart).place(x=800, y=700)
     print("load game")
