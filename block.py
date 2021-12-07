@@ -50,6 +50,9 @@ class wall(block):
     def is_wall(self):
         return True
 
+    def is_block(self):
+        return False
+
 
 class target(block):
     def __init__(self, _x, _y):
