@@ -180,14 +180,15 @@ class game:
         return abs(x[0] - y[0]) + abs(x[1] - y[1])
 
     def evaluateAction(self, action, target, totalSteps):
+
         if(action == 1):
-            left()
+            left('')
         elif(action == 2):
-            up()
+            up('')
         elif(action == 3):
-            right()
+            right('')
         elif(action == 4):
-            down()
+            down('')
         new_state = self.getState()
         finished = True
         stuck = False
@@ -366,6 +367,8 @@ if __name__ == "__main__":
         control_box.T1  = time.time()
 
         for episode in range(100000):
+            if control_box.freeze_flag:
+                break
             print("episode ", episode)
             soft_reset_for_ML()
             totalSteps = 0
@@ -395,7 +398,7 @@ if __name__ == "__main__":
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            soft_reset_for_ML()
+            reset()
         return canvas
 
 
@@ -407,7 +410,7 @@ if __name__ == "__main__":
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            soft_reset_for_ML()
+            reset()
         return canvas
 
 
@@ -419,7 +422,7 @@ if __name__ == "__main__":
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
-            soft_reset_for_ML()
+            reset()
         return canvas
 
 
@@ -431,7 +434,7 @@ if __name__ == "__main__":
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
             tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
-            soft_reset_for_ML()
+            reset()
         return canvas
 
 
