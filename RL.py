@@ -4,7 +4,7 @@ import random
 
 class QLearning:
 
-    def __init__(self, _learning_rate=0.2, _gamma=0.8, _possibility=0.9):
+    def __init__(self, _learning_rate=0.2, _gamma=0.8, _possibility=0.85):
         self.actions = [1, 2, 3, 4]  # a list
         self.learning_rate = _learning_rate
         self.gamma = _gamma
