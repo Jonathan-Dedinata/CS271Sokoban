@@ -4,7 +4,7 @@ import random
 
 class QLearning:
 
-    def __init__(self, _learning_rate=0.2, _gamma=0.8, _possibility=0.9):
+    def __init__(self, _learning_rate=0.5, _gamma=0.75, _possibility=0.9):
         self.actions = [1, 2, 3, 4]  # a list
         self.learning_rate = _learning_rate
         self.gamma = _gamma
@@ -13,13 +13,25 @@ class QLearning:
 
     def chooseAction(self, state, preAction, totalSteps):
         # action = 1
-        self.checkQTable(state)
+        self.checkQTable(str(state))
         # if totalSteps > 1000: p = 0.7
         # elif totalSteps > 500: p = 0.8
         # else: p = self.possibility
+        up_state = state
+        down_state = state
+        left_state = state
+        right_state = state
+        up_state[3][0] += 1
+        down_state[3][0] -= 1
+        right_state[3][1] += 1
+        left_state[3][1] -= 1
+        self.checkQTable(str(up_state))
+        self.checkQTable(str(down_state))
+        self.checkQTable(str(right_state))
+        self.checkQTable(str(left_state))
         p = self.possibility
         if(random.random() < p):
-            actions = self.q_table.loc[state, :]
+            actions = self.q_table.loc[str(state), :]
             action = np.random.choice(actions[actions == actions.max()].index)
         else:
             action = np.random.choice(self.actions)

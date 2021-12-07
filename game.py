@@ -168,10 +168,8 @@ class game:
             for j in range(1, self.v + 1):
                 if self.board[i, j].is_box():
                     state.append([i, j])
-        for i in range(1, self.h + 1):
-            for j in range(1, self.v + 1):
-                if self.board[i, j].is_player():
-                    state.append([i, j])
+        
+        state.append([self.player_x,self.player_y])
         return state
 
     def Manhattan_Dis(self, x, y):
@@ -207,21 +205,31 @@ class game:
                 if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_wall(): stuck = True
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
                 if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_wall(): stuck = True
+
+                if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): stuck = True
+                if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): stuck = True
+                if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): stuck = True
+                if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): stuck = True
+
+                if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): stuck = True
+                if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): stuck = True
+                if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
+                if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
             if stuck:
-                reward -= 10
+                reward -= 10000
 
         for i in range(len(target)):
-            r = 100000
+            r = 10000
             for j in range(len(target)):
                 if occupiedList[j] == 1: continue
                 r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
             if r == 0:
-                reward += 50
+                reward += 500
             else:
                 finished = False
-                # reward -= r
+                reward -= r
         if finished:
-            reward += 500
+            reward += 1000
         reward -= 1 * totalSteps
         return new_state, reward, finished, stuck
 
@@ -359,7 +367,7 @@ if __name__ == "__main__":
             while True:
                 if control_box.freeze_flag:
                     break
-                action = agent.chooseAction(str(state), preAction, totalSteps)
+                action = agent.chooseAction(state, preAction, totalSteps)
                 totalSteps = totalSteps + 1
                 next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps)
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
