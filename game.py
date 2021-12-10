@@ -32,6 +32,12 @@ class control:
         self.p_qtable = pd.DataFrame()
     def get_t2(self):
         self.T2 = time.time()
+    def set_gamma(self,g):
+        self.gamma = g
+    def set_p(self,p):
+        self.p = p
+    def set_lr(self,lr):
+        self.lr = lr
 
     def print_parameters(self):
         return "    gemma: "+str(self.gamma) + "    learning rate: "+str(self.p) +"    probility: "+ str(self.lr)
@@ -390,9 +396,9 @@ if __name__ == "__main__":
         agent.learning_rate = lr
         agent.gamma = gamma
         agent.possibility = p
-        control.p = p
-        control.gamma = gamma
-        control.lr = lr
+        control_box.p = p
+        control_box.gamma = gamma
+        control_box.lr = lr
         control_box.freeze_flag = False
         control_box.T1  = time.time()
         if r:
@@ -438,7 +444,7 @@ if __name__ == "__main__":
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             control_box.p_qtable = agent.q_table.copy(deep=True)
-            soft_reset_for_ML()
+            reset()
         return canvas
 
 
