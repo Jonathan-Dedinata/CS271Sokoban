@@ -166,7 +166,7 @@ class game:
     def getState(self):
         state = []
         # print("board = ", self.board)
-        state.append([self.player_x,self.player_y])
+        state.append([self.player_x, self.player_y])
         for i in range(1, self.h + 1):
             for j in range(1, self.v + 1):
                 if self.board[i, j].is_box():
@@ -201,14 +201,20 @@ class game:
         for i in range(1, len(target) + 1):
             r = 1000
             if (new_state[i][0], new_state[i][1]) in occupiedList:
-                continue
+                if occupiedList[new_state[i][0], new_state[i][1]] == True:
+                    continue
             for j in range(len(target)):
                 r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+            print("r", i, " = ", r)
+            # print(" r2 = ", r)
+            # print(" r3 = ", r)
+            # print("\n")
             if r == 0:
                 reward += 50
             else:
                 finished = False
                 reward -= r
+                # reward += 100 / r
             # some problem
             # if old_state == new_state:
             #     reward -= 1000
@@ -230,15 +236,15 @@ class game:
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
                 if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_wall(): stuck = True
 
-                if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): stuck = True
-                if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): stuck = True
-                if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): stuck = True
-                if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): stuck = True
+                # if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): stuck = True
+                # if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): stuck = True
+                # if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): stuck = True
+                # if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): stuck = True
 
-                if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): stuck = True
-                if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): stuck = True
-                if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
-                if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
+                # if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): stuck = True
+                # if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): stuck = True
+                # if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
+                # if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
             if stuck:
                 reward -= 1000
 
@@ -264,7 +270,7 @@ class game:
         if finished:
             reward += 500
         # reward -= 1 * totalSteps
-        print(reward)
+        print("reward = ", reward)
         return new_state, reward, finished, stuck
 
 def read_input(file_name):
@@ -418,7 +424,7 @@ if __name__ == "__main__":
             preAction = 0
             success_times = 0
             while True:
-                # print(state)
+                print(state)
                 if control_box.freeze_flag:
                     break
                 action = agent.chooseAction(state, preAction, totalSteps, success_times)
@@ -432,7 +438,7 @@ if __name__ == "__main__":
                     break
                 if totalSteps > 2000 or stuck:
                     break
-                # time.sleep(0.)
+                time.sleep(0.5)
 
         #         print('currSteps = ', totalSteps)
         # print('totalSteps = ', totalSteps)
