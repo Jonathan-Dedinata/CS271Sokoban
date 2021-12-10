@@ -166,18 +166,19 @@ class game:
     def getState(self):
         state = []
         # print("board = ", self.board)
+        state.append([self.player_x,self.player_y])
         for i in range(1, self.h + 1):
             for j in range(1, self.v + 1):
                 if self.board[i, j].is_box():
                     state.append([i, j])
         
-        state.append([self.player_x,self.player_y])
+        # state.append([self.player_x,self.player_y])
         return state
 
     def Manhattan_Dis(self, x, y):
         return abs(x[0] - y[0]) + abs(x[1] - y[1])
 
-    def evaluateAction(self, action, target, totalSteps):
+    def evaluateAction(self, action, target, totalSteps, occupiedList):
         old_state = self.getState()
         if(action == 1):
             left('')
@@ -191,19 +192,39 @@ class game:
         finished = True
         stuck = False
         reward = 0
-        occupiedList = []
+        # occupiedList = []
         # for i in range(len(target)):
         #     if self.board[target[i][0], target[i][1]].is_box():
         #         occupiedList.append(1)
         #     else:
         #         occupiedList.append(0)
+        for i in range(1, len(target) + 1):
+            r = 1000
+            if (new_state[i][0], new_state[i][1]) in occupiedList:
+                continue
+            for j in range(len(target)):
+                r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+            if r == 0:
+                reward += 50
+            else:
+                finished = False
+                reward -= r
+            # some problem
+            # if old_state == new_state:
+            #     reward -= 1000
+            #     finished = False
+            # elif r == 0:
+            #     reward += 50
+            # else:
+            #     finished = False
+            #     reward -= r
 
-        for i in range(len(target)):
+        for i in range(1, len(target) + 1):
             x, y = new_state[i][0], new_state[i][1]
             if self.board[x, y].is_target():
-                occupiedList.append(1)
+                occupiedList[x, y] = True
             else:
-                occupiedList.append(0)
+                # occupiedList[x, y] = False
                 if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_wall(): stuck = True
                 if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_wall(): stuck = True
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
@@ -221,25 +242,29 @@ class game:
             if stuck:
                 reward -= 1000
 
-        for i in range(len(target)):
-            r = 1000
-            for j in range(len(target)):
-                if occupiedList[j] != 1:
-                    r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
-            # some problem
-            if old_state == new_state:
-                reward -= 1000
-                finished = False
-            elif r == 0:
-                reward += 50
-            else:
-                finished = False
-                reward -= r
+        # for i in range(len(target)):
+        #     r = 1000
+        #     for j in range(len(target)):
+        #         if occupiedList[j] != 1:
+        #             r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
+        #         else: break
+        #     # some problem
+        #     # if old_state == new_state:
+        #     #     reward -= 1000
+        #     #     finished = False
+        #     # elif r == 0:
+        #     #     reward += 50
+        #     # else:
+        #     #     finished = False
+        #     #     reward -= r
+        #     if occupiedList[j] == 1: break
 
+        if old_state == new_state:
+            reward -= 5
         if finished:
             reward += 500
-        reward -= 1 * totalSteps
-        # print(reward)
+        # reward -= 1 * totalSteps
+        print(reward)
         return new_state, reward, finished, stuck
 
 def read_input(file_name):
@@ -381,10 +406,12 @@ if __name__ == "__main__":
         agent = QLearning()
         control_box.freeze_flag = False
         control_box.T1  = time.time()
-
         for episode in range(100000):
             if control_box.freeze_flag:
                 break
+            occupiedList = {}
+            for i in range(len(target)):
+                occupiedList[target[i][0], target[i][1]] = False
             print("episode ", episode)
             soft_reset_for_ML()
             totalSteps = 0
@@ -396,7 +423,7 @@ if __name__ == "__main__":
                     break
                 action = agent.chooseAction(state, preAction, totalSteps, success_times)
                 totalSteps = totalSteps + 1
-                next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps)
+                next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps, occupiedList)
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
                 preAction = action
@@ -405,7 +432,7 @@ if __name__ == "__main__":
                     break
                 if totalSteps > 2000 or stuck:
                     break
-                # time.sleep(0.00005)
+                # time.sleep(0.)
 
         #         print('currSteps = ', totalSteps)
         # print('totalSteps = ', totalSteps)
