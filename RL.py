@@ -21,10 +21,10 @@ class QLearning:
         down_state = state
         left_state = state
         right_state = state
-        up_state[3][0] += 1
-        down_state[3][0] -= 1
-        right_state[3][1] += 1
-        left_state[3][1] -= 1
+        up_state[0][0] += 1
+        down_state[0][0] -= 1
+        right_state[0][1] += 1
+        left_state[0][1] -= 1
         self.checkQTable(str(up_state))
         self.checkQTable(str(down_state))
         self.checkQTable(str(right_state))
@@ -38,7 +38,7 @@ class QLearning:
         # if abs(action - preAction) == 2:
         #     action = np.random.choice(self.actions)
         return action
-    
+
     def Q_learning(self, state, action, reward, next_state, finished):
         # nextQ = -100000
         self.checkQTable(next_state)
@@ -61,4 +61,6 @@ class QLearning:
                     name=state
                 )
             )
-            
+
+    def getQTableSize(self):
+        return self.q_table.size
