@@ -20,13 +20,19 @@ def next_position(direction, _x, _y):
     else:
         raise AttributeError("wrong direction")
 
-class freeze:
+class control:
     def __init__(self):
+        self.gamma  = -1
+        self.lr = -1
+        self.p = -1
         self.freeze_flag = False
         self.T1 = time.time()
         self.T2 = -1
     def get_t2(self):
         self.T2 = time.time()
+
+    def print_parameters(self):
+        return "    gemma: "+str(self.gamma) + "    learning rate: "+str(self.p) +"    probility: "+ str(self.lr)
 
 class game:
     player_x = -1
@@ -331,7 +337,7 @@ if __name__ == "__main__":
     except IOError:
         f = open(file_name + "_result", 'w')
         config = {platform.machine(),platform.version(),platform.platform(),platform.uname(),platform.processor()}
-        config = pprint.pformat(config)
+        config = pprint.pformat(config) + "\n"
         f.write(str(config))
         f.flush()
         f.close()
@@ -375,13 +381,16 @@ if __name__ == "__main__":
     canvas.pack()
     g = game(x, y, n, grids_data, v, h)
     # exit()
-    control_box = freeze()
+    control_box = control()
 
     def AI_Sokoban(grids, state, target,lr,gamma,p):
         agent = QLearning()
         agent.learning_rate = lr
         agent.gamma = gamma
         agent.possibility = p
+        control.p = p
+        control.gamma = gamma
+        control.lr = lr
         control_box.freeze_flag = False
         control_box.T1  = time.time()
 
@@ -421,7 +430,8 @@ if __name__ == "__main__":
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
-            result.write(str((control_box.T2 - control_box.T1))+"\n")
+            result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
+            result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             soft_reset_for_ML()
         return canvas
@@ -434,7 +444,8 @@ if __name__ == "__main__":
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
-            result.write(str((control_box.T2 - control_box.T1))+"\n")
+            result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
+            result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             reset()
         return canvas
@@ -447,7 +458,8 @@ if __name__ == "__main__":
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
-            result.write(str((control_box.T2 - control_box.T1))+"\n")
+            result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
+            result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
             reset()
         return canvas
@@ -460,7 +472,7 @@ if __name__ == "__main__":
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
             control_box.T2 = time.time()
-            result.write(str((control_box.T2 - control_box.T1))+"\n")
+            result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+'\n')
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
             reset()
