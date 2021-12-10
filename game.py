@@ -191,6 +191,7 @@ class game:
         new_state = self.getState()
         finished = True
         stuck = False
+        badMove = False
         reward = 0
         # occupiedList = []
         # for i in range(len(target)):
@@ -204,6 +205,8 @@ class game:
                 if occupiedList[new_state[i][0], new_state[i][1]] == True:
                     continue
             for j in range(len(target)):
+                if occupiedList[target[j][0], target[j][1]] == True:
+                    continue
                 r = min(r, self.Manhattan_Dis(new_state[i], target[j]))
             print("r", i, " = ", r)
             # print(" r2 = ", r)
@@ -236,17 +239,19 @@ class game:
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
                 if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_wall(): stuck = True
 
-                # if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): stuck = True
-                # if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): stuck = True
-                # if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): stuck = True
-                # if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): stuck = True
+                if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): badMove = True
+                if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): badMove = True
+                if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): badMove = True
+                if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): badMove = True
 
-                # if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): stuck = True
-                # if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): stuck = True
-                # if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
-                # if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
+                if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): badMove = True
+                if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): badMove = True
+                if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): badMove = True
+                if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): badMove = True
             if stuck:
                 reward -= 1000
+            if badMove:
+                reward -= 10
 
         # for i in range(len(target)):
         #     r = 1000
@@ -436,9 +441,9 @@ if __name__ == "__main__":
                 if finished:  
                     success_times += 1
                     break
-                if totalSteps > 2000 or stuck:
+                if totalSteps > 500 or stuck:
                     break
-                time.sleep(0.5)
+                # time.sleep(0.5)
 
         #         print('currSteps = ', totalSteps)
         # print('totalSteps = ', totalSteps)
