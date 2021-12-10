@@ -359,7 +359,7 @@ if __name__ == "__main__":
 
     window.geometry('800x800')
 
-    canvas = tk.Canvas(window, bg='white', height=780, width=780)
+    canvas = tk.Canvas(window, bg='white', height=600, width=600)
 
     grids = []
     for i in range(v):
@@ -375,14 +375,13 @@ if __name__ == "__main__":
     canvas.pack()
     g = game(x, y, n, grids_data, v, h)
     # exit()
-
     control_box = freeze()
 
-
-
-
-    def AI_Sokoban(grids, state, target):
+    def AI_Sokoban(grids, state, target,lr,gamma,p):
         agent = QLearning()
+        agent.learning_rate = lr
+        agent.gamma = gamma
+        agent.possibility = p
         control_box.freeze_flag = False
         control_box.T1  = time.time()
 
@@ -485,9 +484,41 @@ if __name__ == "__main__":
 
 
     state = g.getState()
-    b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, state, target_positions)).place(x=500, y=700)
-    b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
-    b_soft_rest = tk.Button(window, text='SOFT_RESET', command = soft_reset_for_ML).place(x=600, y=600)
+    f = tk.Frame()
+    f.pack()
+
+
+
+
+    f1 = tk.Frame()
+    f1.pack()
+    L1 = tk.Label(f1, text="learning_rate")
+    L1.pack(side='left')
+    E1 = tk.Entry(f1, bd=5)
+    E1.pack(side='right')
+
+    f2 = tk.Frame()
+    f2.pack()
+    L2 = tk.Label(f2, text="gamma")
+    L2.pack(side='left')
+    E2 = tk.Entry(f2, bd=5)
+    E2.pack(side='right')
+
+    f3 = tk.Frame()
+    f3.pack()
+    L3 = tk.Label(f3, text="possibility")
+    L3.pack(side='left')
+    E3 = tk.Entry(f3, bd=5)
+    E3.pack(side='right')
+
+    b_run_ = tk.Button(f, text='RUN', command=lambda: AI_Sokoban(grids_data, state, target_positions,float(E1.get()),float(E2.get()),float(E3.get()) )).pack()
+    b_reset_ = tk.Button(f, text='RESET', command=reset).pack()
+    #b_soft_rest_ = tk.Button(f, text='SOFT_RESET', command=soft_reset_for_ML).pack()
+
+
+   # b_run = tk.Button(window, text='RUN', command=lambda :AI_Sokoban(grids_data, state, target_positions)).place(x=500, y=700)
+    #b_reset = tk.Button(window, text='RESET', command = reset).place(x=600, y=700)
+    #b_soft_rest = tk.Button(window, text='SOFT_RESET', command = soft_reset_for_ML).place(x=600, y=600)
 
     window.bind('<Up>',up)
     window.bind('<Down>', down)
