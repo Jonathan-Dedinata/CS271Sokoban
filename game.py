@@ -7,6 +7,7 @@ from RL import QLearning
 from copy import deepcopy
 import platform
 import pprint
+import pandas as pd
 
 def next_position(direction, _x, _y):
     if direction == 1:
@@ -28,6 +29,7 @@ class control:
         self.freeze_flag = False
         self.T1 = time.time()
         self.T2 = -1
+        self.p_qtable = pd.DataFrame()
     def get_t2(self):
         self.T2 = time.time()
 
@@ -382,9 +384,9 @@ if __name__ == "__main__":
     g = game(x, y, n, grids_data, v, h)
     # exit()
     control_box = control()
+    agent = QLearning()
+    def AI_Sokoban(grids, state, target,lr,gamma,p,r):
 
-    def AI_Sokoban(grids, state, target,lr,gamma,p):
-        agent = QLearning()
         agent.learning_rate = lr
         agent.gamma = gamma
         agent.possibility = p
@@ -393,6 +395,8 @@ if __name__ == "__main__":
         control.lr = lr
         control_box.freeze_flag = False
         control_box.T1  = time.time()
+        if r:
+            agent.q_table = control_box.p_qtable.copy(deep=True)
 
         for episode in range(100000):
             if control_box.freeze_flag:
@@ -409,12 +413,12 @@ if __name__ == "__main__":
                 action = agent.chooseAction(state, preAction, totalSteps, success_times)
                 totalSteps = totalSteps + 1
                 next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps)
+                if finished:
+                    success_times += 1
+                    break
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
                 state = next_state
                 preAction = action
-                if finished:  
-                    success_times += 1
-                    break
                 if totalSteps > 2000 or stuck:
                     break
                 # time.sleep(0.00005)
@@ -433,6 +437,7 @@ if __name__ == "__main__":
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            control_box.p_qtable = agent.q_table.copy(deep=True)
             soft_reset_for_ML()
         return canvas
 
@@ -447,6 +452,7 @@ if __name__ == "__main__":
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            control_box.p_qtable = agent.q_table.copy(deep=True)
             reset()
         return canvas
 
@@ -461,6 +467,7 @@ if __name__ == "__main__":
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes" + str((control_box.T2 - control_box.T1))+ "  seconds")
+            control_box.p_qtable = agent.q_table.copy(deep=True)
             reset()
         return canvas
 
@@ -475,6 +482,7 @@ if __name__ == "__main__":
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+'\n')
             result.flush()
             tk.messagebox.showinfo("result", "Successful, it takes  " + str((control_box.T2 - control_box.T1)) + "  seconds")
+            control_box.p_qtable = agent.q_table.copy(deep=True)
             reset()
         return canvas
 
@@ -523,7 +531,10 @@ if __name__ == "__main__":
     E3 = tk.Entry(f3, bd=5)
     E3.pack(side='right')
 
-    b_run_ = tk.Button(f, text='RUN', command=lambda: AI_Sokoban(grids_data, state, target_positions,float(E1.get()),float(E2.get()),float(E3.get()) )).pack()
+    b_run_ = tk.Button(f, text='RUN', command=lambda: AI_Sokoban(grids_data, state, target_positions,float(E1.get()),float(E2.get()),float(E3.get()),False )).pack()
+    b_run_p = tk.Button(f, text='RUN_WITH_PREVIOUS_Qtable',
+                       command=lambda: AI_Sokoban(grids_data, state, target_positions, float(E1.get()), float(E2.get()),
+                                                  float(E3.get()),True)).pack()
     b_reset_ = tk.Button(f, text='RESET', command=reset).pack()
     #b_soft_rest_ = tk.Button(f, text='SOFT_RESET', command=soft_reset_for_ML).pack()
 
