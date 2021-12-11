@@ -186,8 +186,8 @@ class game:
         state = []
         # print("board = ", self.board)
         state.append([self.player_x, self.player_y])
-        for i in range(1, self.h + 1):
-            for j in range(1, self.v + 1):
+        for i in range(1, self.v + 1):
+            for j in range(1, self.h + 1):
                 if self.board[i, j].is_box():
                     state.append([i, j])
         
@@ -197,7 +197,7 @@ class game:
     def Manhattan_Dis(self, x, y):
         return abs(x[0] - y[0]) + abs(x[1] - y[1])
 
-    def evaluateAction(self, action, target, totalSteps, occupiedList):
+    def evaluateAction(self, action, target, totalSteps, occupiedList, prevDis):
         old_state = self.getState()
         if(action == 1):
             left('')
@@ -211,8 +211,8 @@ class game:
         finished = True
         stuck = False
         badMove = False
-        reward = 0
-
+        reward = -1
+        curDis = 0
         # for i in range(len(target)):
         #     if self.board[target[i][0], target[i][1]].is_box():
         #         occupiedList.append(1)
@@ -231,12 +231,15 @@ class game:
             # print(" r2 = ", r)
             # print(" r3 = ", r)
             # print("\n")
+            curDis += r
             if r == 0:
                 reward += 200
             else:
                 # print("test")
+                # print("prevDis = ", prevDis)
+                # print("curDis = ", curDis)
                 finished = False
-                # reward -= r
+                # reward += (prevDis - curDis)
                 # reward += round(10 / r, 2)
             # some problem
             # if old_state == new_state:
@@ -247,6 +250,7 @@ class game:
             # else:
             #     finished = False
             #     reward -= r
+        # reward += (prevDis - curDis)
 
         for i in range(1, len(target) + 1):
             x, y = new_state[i][0], new_state[i][1]
@@ -258,16 +262,6 @@ class game:
                 if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_wall(): stuck = True
                 if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_wall(): stuck = True
                 if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_wall(): stuck = True
-
-                if self.board[x - 1, y].is_box() and self.board[x, y + 1].is_wall(): stuck = True
-                if self.board[x, y + 1].is_box() and self.board[x + 1, y].is_wall(): stuck = True
-                if self.board[x + 1, y].is_box() and self.board[x, y - 1].is_wall(): stuck = True
-                if self.board[x, y - 1].is_box() and self.board[x - 1, y].is_wall(): stuck = True
-
-                if self.board[x - 1, y].is_wall() and self.board[x, y + 1].is_box(): stuck = True
-                if self.board[x, y + 1].is_wall() and self.board[x + 1, y].is_box(): stuck = True
-                if self.board[x + 1, y].is_wall() and self.board[x, y - 1].is_box(): stuck = True
-                if self.board[x, y - 1].is_wall() and self.board[x - 1, y].is_box(): stuck = True
         if stuck:
             reward -= 1000
         if badMove:
@@ -297,7 +291,7 @@ class game:
             reward += 10000
         # reward -= 1 * totalSteps
         print("reward = ", reward)
-        return new_state, reward, finished, stuck
+        return new_state, reward, finished, stuck, curDis
 
 def read_input(file_name):
     data_flow = []
@@ -372,7 +366,7 @@ def draw(canvas, grids_data, x, y):
 
 
 
-
+# success_times = 0
 
 if __name__ == "__main__":
     print("this is game class")
@@ -430,6 +424,7 @@ if __name__ == "__main__":
     # exit()
     control_box = control()
     agent = QLearning()
+    success_times = 0 
     def AI_Sokoban(grids, state, target,lr,gamma,p,r):
 
         agent.learning_rate = lr
@@ -440,10 +435,14 @@ if __name__ == "__main__":
         control_box.lr = lr
         control_box.freeze_flag = False
         control_box.T1  = time.time()
+        # control_box.success_times
+        # success_times = 0
+        global success_times
         if r:
+            # success_times = control_box.success_times
+            success_times += 1
             agent.q_table = control_box.p_qtable.copy(deep=True)
-
-        for episode in range(100000):
+        for episode in range(100):
             if control_box.freeze_flag:
                 break
             occupiedList = {}
@@ -453,34 +452,50 @@ if __name__ == "__main__":
             soft_reset_for_ML()
             totalSteps = 0
             preAction = 0
-            success_times = 0
+            prevDis = 0
+            for i in range(1, len(target) + 1):
+                dis = 100000
+                for j in range(len(target)):
+                    if occupiedList[target[j][0], target[j][1]] == True:
+                        continue
+                    dis = min(dis, g.Manhattan_Dis(state[i], target[j]))
+                prevDis += dis
+            # print("prevDis = ", prevDis)
             while True:
                 # print(state)
+                print("episode = ", episode)
+                print("q_table_size = ", agent.getQTableSize())
+                print("success_times = ", success_times)
                 if control_box.freeze_flag:
                     break
                 action = agent.chooseAction(state, preAction, totalSteps, success_times)
                 totalSteps = totalSteps + 1
-                next_state, reward, finished, stuck = g.evaluateAction(action, target, totalSteps,occupiedList)
-                if finished:
-                    success_times += 1
-                    break
+                next_state, reward, finished, stuck, curDis = g.evaluateAction(action, target, totalSteps, occupiedList, prevDis)
                 agent.Q_learning(str(state), action, reward, str(next_state), finished)
+                if finished:
+                    # success_times += 1
+                    print("episode = ", episode)
+                    print("q_table_size = ", agent.getQTableSize())
+                    # time.sleep(15)
+                    break
                 state = next_state
                 preAction = action
-                if totalSteps > 2000 or stuck:
+                prevDis = curDis
+                if totalSteps > 500 or stuck:
                     break
-                # time.sleep(0.00005)
+                # time.sleep(10)
 
         #         print('currSteps = ', totalSteps)
         # print('totalSteps = ', totalSteps)
 
-
+    # success_times = 0 
     def up(e):
         g.step(1)
         draw(canvas, g.board, g.player_x, g.player_y)
         canvas.update()
         print("up")
         if g.number_of_box == g.number_of_box_on_target:
+            # success_times += 1
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
@@ -496,6 +511,7 @@ if __name__ == "__main__":
         canvas.update()
         print("down")
         if g.number_of_box == g.number_of_box_on_target:
+            # success_times += 1
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
@@ -511,6 +527,7 @@ if __name__ == "__main__":
         canvas.update()
         print("left")
         if g.number_of_box == g.number_of_box_on_target:
+            # success_times += 1
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+"\n")
             result.flush()
@@ -526,6 +543,7 @@ if __name__ == "__main__":
         canvas.update()
         print("right")
         if g.number_of_box == g.number_of_box_on_target:
+            # success_times += 1
             control_box.T2 = time.time()
             result.write(str((control_box.T2 - control_box.T1))+control_box.print_parameters()+'\n')
             result.flush()
